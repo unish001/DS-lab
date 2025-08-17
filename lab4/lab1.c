@@ -59,7 +59,7 @@ int main() {
             if (mat2[i][j] != 0 && mat2[i][j] != 1) {
                 printf("Invalid input! Only 0 or 1 allowed.\n");
                 return 1;
-            }
+            }2
         }
     }
     binaryMatrixMultiplication(mat1, mat2, result, rows1, cols1, cols2);
