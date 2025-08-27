@@ -1,0 +1,112 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define N 3   // size of the square matrix (you can change it)
+
+// Function to calculate determinant of a matrix
+float determinant(float a[N][N], int n) {
+    float det = 0;
+    float sub[N][N];
+    if (n == 1)
+        return a[0][0];
+    if (n == 2)
+        return (a[0][0]*a[1][1] - a[0][1]*a[1][0]);
+
+    for (int x = 0; x < n; x++) {
+        int subi = 0;
+        for (int i = 1; i < n; i++) {
+            int subj = 0;
+            for (int j = 0; j < n; j++) {
+                if (j == x) continue;
+                sub[subi][subj] = a[i][j];
+                subj++;
+            }
+            subi++;
+        }
+        det += (x % 2 == 0 ? 1 : -1) * a[0][x] * determinant(sub, n - 1);
+    }
+    return det;
+}
+
+// Function to get cofactor matrix
+void cofactor(float a[N][N], float cof[N][N], int n) {
+    float sub[N][N];
+    for (int row = 0; row < n; row++) {
+        for (int col = 0; col < n; col++) {
+            int subi = 0;
+            for (int i = 0; i < n; i++) {
+                if (i == row) continue;
+                int subj = 0;
+                for (int j = 0; j < n; j++) {
+                    if (j == col) continue;
+                    sub[subi][subj] = a[i][j];
+                    subj++;
+                }
+                subi++;
+            }
+            cof[row][col] = ((row + col) % 2 == 0 ? 1 : -1) * determinant(sub, n - 1);
+        }
+    }
+}
+
+// Function to transpose a matrix
+void transpose(float a[N][N], float at[N][N], int n) {
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            at[j][i] = a[i][j];
+}
+
+// Function to find inverse of a matrix
+int inverse(float a[N][N], float inv[N][N], int n) {
+    float det = determinant(a, n);
+    if (det == 0) {
+        printf("Matrix is singular, inverse not possible.\n");
+        return 0;
+    }
+
+    float cof[N][N], adj[N][N];
+    cofactor(a, cof, n);
+    transpose(cof, adj, n);
+
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            inv[i][j] = adj[i][j] / det;
+
+    return 1;
+}
+
+// Multiply matrices
+void multiply(float a[N][N], float b[N][N], float result[N][N], int n) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            result[i][j] = 0;
+            for (int k = 0; k < n; k++)
+                result[i][j] += a[i][k] * b[k][j];
+        }
+    }
+}
+
+int main() {
+    float A[N][N] = {{1, 2, 3},
+                     {0, 1, 4},
+                     {5, 6, 0}};
+
+    float B[N][N] = {{7, 8, 9},
+                     {2, 3, 4},
+                     {1, 0, 6}};
+
+    float Binv[N][N], C[N][N];
+
+    if (inverse(B, Binv, N)) {
+        multiply(A, Binv, C, N);
+
+        printf("Result of A * B^(-1):\n");
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++)
+                printf("%8.3f ", C[i][j]);
+            printf("\n");
+        }
+    }
+
+    return 0;
+}
